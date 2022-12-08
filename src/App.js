@@ -1,7 +1,37 @@
+import { useCallback, useState} from 'react';
 import logo from './logo.svg';
 import './App.css';
+import detectEthereumProvider from '@metamask/detect-provider'
+import { ethers } from "ethers";
+
+const useProvider = (wndEth) => {
+  const [p, setp] = useState(null)
+
+  useCallback(async () => {
+    const provider = await detectEthereumProvider()
+    setp(provider)
+  }, [wndEth])
+
+  return p
+}
 
 function App() {
+
+  // check window.ethereum repeatedly?
+  const wndEth = window.ethereum;
+  // useProvider
+
+  // const detectedProvider = await detectEthereumProvider()
+  const detectedProvider = useProvider(window.ethereum);
+  console.log('detectedProvider', detectedProvider)
+
+  let provider;
+  if (window.ethereum !== undefined) {
+    // console.log("wndethereum !== undefined");
+    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+  }
+
+  
   return (
     <div className="App">
       <header className="App-header">
@@ -9,14 +39,10 @@ function App() {
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <p>Do we have window.etherem? {!!wndEth ? 'yes': 'no'} </p>
+        <p>Do we have window.etherem.isMetaMask? {!!wndEth.isMetaMask ? 'yes': 'no'} </p>
+        <p>Detected Provider: {!!detectedProvider ? 'yes': 'no'}</p>
+        <p>Provider via window: {!!provider ? 'yes': 'no'}</p>
       </header>
     </div>
   );
